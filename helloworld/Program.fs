@@ -3,11 +3,26 @@
 open System
 
 // Define a function to construct a message to print
-let from whom =
-    sprintf "from %s" whom
+let from whom = $"from {whom} program"
+
+let greetAPerson person =
+    let message = $"{person}, " + from "F#" // Call the function
+    printfn $"Hello, {message}"
+
+let greetPeople (people: string array) =
+    Array.iter greetAPerson people
+    printfn "Nice to meet you all!"
 
 [<EntryPoint>]
 let main argv =
-    let message = from "F#" // Call the function
-    printfn "Hello world %s" message
-    0 // return an integer exit code
+    match argv with
+    | _ when argv.Length > 1 ->
+        greetPeople argv
+        0
+    | _ when argv.Length = 1 ->
+        greetAPerson argv.[0]
+        printfn "It's dangerous to go alone!"
+        0
+    | _ ->
+        greetAPerson "Anonymus"
+        0
