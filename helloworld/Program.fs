@@ -9,8 +9,11 @@ let greetAPerson person =
     let message = $"{person}, " + from "F#" // Call the function
     printfn $"Hello, {message}"
 
-let greetPeople (people: string array) =
-    Array.iter greetAPerson people
+let greetPeople people =
+    people
+        |> Array.filter (not << String.IsNullOrWhiteSpace)
+        |> Array.filter ((<>) "Bob")
+        |> Array.iter greetAPerson
     printfn "Nice to meet you all!"
 
 [<EntryPoint>]
