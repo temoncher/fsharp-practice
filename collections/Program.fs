@@ -9,7 +9,7 @@ type Student =
       MaxScore: float }
 
 module Student =
-    let parseScore (s: string) : option<float> =
+    let private parseScore (s: string) : option<float> =
         if s = "N/A" then
             None
         else
@@ -29,7 +29,7 @@ module Student =
           MinScore = scores |> Array.min
           MaxScore = scores |> Array.max }
 
-    let printSummary (student: Student) =
+    let printSummary (student: Student) : unit =
         printfn
             "%s\t%s\t%0.1f\t%0.1f\t%0.1f"
             student.Name
@@ -38,7 +38,7 @@ module Student =
             student.MinScore
             student.MaxScore
 
-let printMeanStudentsScores filePath =
+let printMeanStudentsScores (filePath: string) : unit =
     printfn "Processing %s..." filePath
     // Read
     let rows =
