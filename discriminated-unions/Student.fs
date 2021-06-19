@@ -9,17 +9,17 @@ type Student =
       MaxScore: float }
 
 module Student =
-    let private parseName (s: string) : (string * string) =
+    let private parseName (s: string) : {| Surname: string; GivenName: string |} =
         let givenAndSurNames = s.Split(',')
 
         match givenAndSurNames with
-        | [| sur; given |] -> (sur.Trim(), given.Trim())
-        | [| sur |] -> (sur.Trim(), "(None)")
+        | [| surname; givenName |] -> {| Surname = surname.Trim(); GivenName = givenName.Trim() |}
+        | [| surname |] -> {| Surname = surname.Trim(); GivenName = "(None)" |}
         | _ -> raise (System.FormatException("Invalid student name format"))
 
     let fromString (s: string) : Student =
         let elements = s.Split('\t')
-        let (sur, given) = parseName(elements.[0].Trim())
+        let name = parseName (elements.[0].Trim())
 
         let scores =
             elements
@@ -27,8 +27,8 @@ module Student =
             |> Array.map TestResult.fromString
             |> Array.choose TestResult.tryToEffectiveScore
 
-        { Surname = sur
-          GivenName = given
+        { Surname = name.Surname
+          GivenName = name.GivenName
           Id = elements.[1].Trim()
           MeanScore = scores |> Array.average
           MinScore = scores |> Array.min
