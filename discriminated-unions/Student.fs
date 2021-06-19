@@ -13,12 +13,12 @@ module Student =
         let givenAndSurNames = s.Split(',')
 
         match givenAndSurNames with
-        | [| given; sur |] -> (given.Trim(), sur.Trim())
+        | [| sur; given |] -> (sur.Trim(), given.Trim())
         | _ -> raise (System.FormatException("Invalid student name format"))
 
     let fromString (s: string) : Student =
         let elements = s.Split('\t')
-        let (given, sur) = parseName(elements.[0].Trim())
+        let (sur, given) = parseName(elements.[0].Trim())
 
         let scores =
             elements
@@ -28,7 +28,7 @@ module Student =
 
         { Surname = sur
           GivenName = given
-          Id = elements.[1]
+          Id = elements.[1].Trim()
           MeanScore = scores |> Array.average
           MinScore = scores |> Array.min
           MaxScore = scores |> Array.max }
