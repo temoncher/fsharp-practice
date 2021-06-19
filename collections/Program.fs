@@ -9,11 +9,19 @@ type Student =
       MaxScore: float }
 
 module Student =
+    let parseScore (s: string) : option<float> =
+        if s = "N/A" then
+            None
+        else
+            Some(float s)
+
     let fromString (s: string) : Student =
         let elements = s.Split('\t')
 
         let scores =
-            elements |> Array.skip 2 |> Array.map float
+            elements
+            |> Array.skip 2
+            |> Array.choose parseScore
 
         { Name = elements.[0]
           Id = elements.[1]
@@ -33,17 +41,16 @@ module Student =
 let printMeanStudentsScores filePath =
     printfn "Processing %s..." filePath
     // Read
-    let rows = File.ReadAllLines filePath
+    let rows =
+        filePath |> File.ReadAllLines |> Array.skip 1
     // Process
-    let students =
-        rows
-        |> Array.skip 1
-        |> Array.map Student.fromString
+    let students = rows |> Array.map Student.fromString
     // Output
     printfn "Students count is %i" (students |> Array.length)
+
     students
-        |> Array.sortByDescending (fun student -> student.MeanScore)
-        |> Array.iter Student.printSummary
+    |> Array.sortByDescending (fun student -> student.MeanScore)
+    |> Array.iter Student.printSummary
 
 [<EntryPoint>]
 let main argv =
