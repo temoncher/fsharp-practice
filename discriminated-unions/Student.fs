@@ -15,7 +15,7 @@ module Student =
         match givenAndSurNames with
         | [| surname; givenName |] -> {| Surname = surname.Trim(); GivenName = givenName.Trim() |}
         | [| surname |] -> {| Surname = surname.Trim(); GivenName = "(None)" |}
-        | _ -> raise (System.FormatException("Invalid student name format"))
+        | _ -> raise (System.FormatException(sprintf "Invalid student name format: \"%s\"" s))
 
     let fromString (s: string) : Student =
         let elements = s.Split('\t')
