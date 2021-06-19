@@ -1,25 +1,20 @@
 // Learn more about F# at http://docs.microsoft.com/dotnet/fsharp
-
-open System
 open System.IO
 
 let getMeanScore (row: string) =
     let elements = row.Split('\t')
     let name = elements.[0]
     let id = elements.[1]
-
     let meanScore =
         elements
         |> Array.skip 2
-        |> Array.map float
-        |> Array.average
-
-    sprintf "%s	%s	%f" name id meanScore
+        |> Array.averageBy float
+    (name, id, meanScore)
 
 
-let processRows (rows) =
-    let meanScores = Array.map getMeanScore rows
-    (rows |> Array.length, meanScores)
+let processRows rows = (rows |> Array.length, rows |> Array.map getMeanScore)
+
+let printMeanScore (name, id, meanScore) = printfn "%s\t%s\t%0.1f" name id meanScore
 
 [<EntryPoint>]
 let main argv =
@@ -29,9 +24,9 @@ let main argv =
         if File.Exists filePath then
             printfn "Processing %s..." filePath
             let rows = File.ReadAllLines filePath
-            let (studentsCount, meanScores) = processRows rows
+            let (studentsCount, meanScores) = processRows (rows |> Array.skip 1)
             printfn "Students count is %i" studentsCount
-            Array.iter (printfn "%s") meanScores
+            Array.iter printMeanScore meanScores
             0
         else
             printfn "Such file doesn't exist"

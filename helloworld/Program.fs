@@ -21,11 +21,9 @@ let main argv =
     match argv with
     | _ when argv.Length > 1 ->
         greetPeople argv
-        0
     | _ when argv.Length = 1 ->
         greetAPerson argv.[0]
         printfn "It's dangerous to go alone!"
-        0
     | _ ->
         greetAPerson "Anonymus"
-        0
+    0
