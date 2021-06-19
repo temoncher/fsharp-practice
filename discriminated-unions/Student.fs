@@ -1,15 +1,24 @@
 namespace StudentScores
 
 type Student =
-    { Name: string
+    { Surname: string
+      GivenName: string
       Id: string
       MeanScore: float
       MinScore: float
       MaxScore: float }
 
 module Student =
+    let private parseName (s: string) : (string * string) =
+        let givenAndSurNames = s.Split(',')
+
+        match givenAndSurNames with
+        | [| given; sur |] -> (given.Trim(), sur.Trim())
+        | _ -> raise (System.FormatException("Invalid student name format"))
+
     let fromString (s: string) : Student =
         let elements = s.Split('\t')
+        let (given, sur) = parseName(elements.[0].Trim())
 
         let scores =
             elements
@@ -17,7 +26,8 @@ module Student =
             |> Array.map TestResult.fromString
             |> Array.choose TestResult.tryToEffectiveScore
 
-        { Name = elements.[0]
+        { Surname = sur
+          GivenName = given
           Id = elements.[1]
           MeanScore = scores |> Array.average
           MinScore = scores |> Array.min
@@ -25,8 +35,9 @@ module Student =
 
     let printSummary (student: Student) : unit =
         printfn
-            "%s\t%s\t%0.1f\t%0.1f\t%0.1f"
-            student.Name
+            "%s, %s\t%s\t%0.1f\t%0.1f\t%0.1f"
+            student.Surname
+            student.GivenName
             student.Id
             student.MeanScore
             student.MinScore
