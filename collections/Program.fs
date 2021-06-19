@@ -1,20 +1,49 @@
 // Learn more about F# at http://docs.microsoft.com/dotnet/fsharp
 open System.IO
 
-let getMeanScore (row: string) =
-    let elements = row.Split('\t')
-    let name = elements.[0]
-    let id = elements.[1]
-    let meanScore =
-        elements
-        |> Array.skip 2
-        |> Array.averageBy float
-    (name, id, meanScore)
+type Student =
+    { Name: string
+      Id: string
+      MeanScore: float
+      MinScore: float
+      MaxScore: float }
 
+module Student =
+    let fromString (s: string) : Student =
+        let elements = s.Split('\t')
 
-let processRows rows = (rows |> Array.length, rows |> Array.map getMeanScore)
+        let scores =
+            elements |> Array.skip 2 |> Array.map float
 
-let printMeanScore (name, id, meanScore) = printfn "%s\t%s\t%0.1f" name id meanScore
+        { Name = elements.[0]
+          Id = elements.[1]
+          MeanScore = scores |> Array.average
+          MinScore = scores |> Array.min
+          MaxScore = scores |> Array.max }
+
+    let printSummary (student: Student) =
+        printfn
+            "%s\t%s\t%0.1f\t%0.1f\t%0.1f"
+            student.Name
+            student.Id
+            student.MeanScore
+            student.MinScore
+            student.MaxScore
+
+let printMeanStudentsScores filePath =
+    printfn "Processing %s..." filePath
+    // Read
+    let rows = File.ReadAllLines filePath
+    // Process
+    let students =
+        rows
+        |> Array.skip 1
+        |> Array.map Student.fromString
+    // Output
+    printfn "Students count is %i" (students |> Array.length)
+    students
+        |> Array.sortByDescending (fun student -> student.MeanScore)
+        |> Array.iter Student.printSummary
 
 [<EntryPoint>]
 let main argv =
@@ -22,11 +51,7 @@ let main argv =
         let filePath = argv.[0]
 
         if File.Exists filePath then
-            printfn "Processing %s..." filePath
-            let rows = File.ReadAllLines filePath
-            let (studentsCount, meanScores) = processRows (rows |> Array.skip 1)
-            printfn "Students count is %i" studentsCount
-            Array.iter printMeanScore meanScores
+            printMeanStudentsScores filePath
             0
         else
             printfn "Such file doesn't exist"
